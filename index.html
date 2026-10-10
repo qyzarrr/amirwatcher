@@ -205,6 +205,157 @@
 
         .nav-right { justify-self: end; }
 
+        .nav-center { position: relative; }
+
+        /* ── RECENT SEARCHES PANEL ── */
+        .search-history-panel {
+            position: absolute;
+            top: calc(100% + 14px);
+            left: 50%;
+            width: 360px;
+            max-width: calc(100vw - 32px);
+            background: rgba(13, 13, 22, 0.92);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(110, 231, 183, 0.04);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(-10px) scale(0.98);
+            transition: opacity 0.28s ease,
+                        transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        visibility 0.28s;
+            z-index: 1200;
+        }
+
+        .search-history-panel.visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        .search-history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6px 12px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .search-history-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-history-clear {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 100px;
+            transition: all 0.25s ease;
+        }
+
+        .search-history-clear:hover {
+            color: #6ee7b7;
+            background: rgba(110, 231, 183, 0.1);
+        }
+
+        .search-history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.22s ease, transform 0.22s ease;
+            animation: histIn 0.3s ease both;
+        }
+
+        @keyframes histIn {
+            from { opacity: 0; transform: translateX(-6px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .history-item:hover {
+            background: rgba(110, 231, 183, 0.08);
+            transform: translateX(3px);
+        }
+
+        .history-item .hist-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+            transition: color 0.22s ease;
+        }
+
+        .history-item:hover .hist-icon { color: #6ee7b7; }
+
+        .history-item .hist-text {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.78);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item .hist-remove {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.22s ease;
+        }
+
+        .history-item .hist-remove:hover {
+            background: rgba(239, 68, 68, 0.16);
+            color: #ef4444;
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 22px 10px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.28);
+            letter-spacing: 0.3px;
+        }
+        /* ── END RECENT SEARCHES PANEL ── */
+
         .hero-carousel {
             position: relative;
             width: 100%;
@@ -875,6 +1026,20 @@
                 <a class="nav-link" href="#" onclick="showCategoryPage('shows')">Shows</a>
                 <a class="nav-link" href="#" onclick="showMyList()">My List</a>
             </div>
+
+            <div class="search-history-panel" id="searchHistoryPanel">
+                <div class="search-history-header">
+                    <span class="search-history-title">Recent Searches</span>
+                    <button class="search-history-clear" id="clearHistoryBtn" onclick="clearSearchHistory()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Clear all
+                    </button>
+                </div>
+                <div class="search-history-list" id="searchHistoryList"></div>
+            </div>
         </div>
 
         <div class="nav-right"></div>
@@ -1270,28 +1435,80 @@
 
         function saveContinue(item, type) {
             let list = JSON.parse(localStorage.getItem("continueWatching") || "[]");
+            const mediaType = type || (item.title ? "movie" : "tv");
             list = list.filter(x => x.id !== item.id);
-            list.unshift({ id: item.id, title: item.title || item.name, poster: item.poster_path, type });
+            list.unshift({
+                id: item.id,
+                title: item.title || item.name || "Untitled",
+                poster: item.poster_path,
+                backdrop: item.backdrop_path || null,
+                type: mediaType,
+                year: (item.release_date || item.first_air_date || "").slice(0, 4),
+                rating: item.vote_average || 0
+            });
             localStorage.setItem("continueWatching", JSON.stringify(list.slice(0, 10)));
             loadContinue();
         }
 
-        function loadContinue() {
-            const list = JSON.parse(localStorage.getItem("continueWatching") || "[]");
+        function renderContinueCards(list) {
             continueRow.innerHTML = "";
             if (!list.length) {
-                continueRow.innerHTML = `<div class="empty-state">Your watchlist is empty.</div>`;
+                continueRow.innerHTML = `<div class="empty-state">Nothing here yet — start watching something!</div>`;
                 return;
             }
             list.forEach(item => {
-                if (item.poster) continueRow.appendChild(buildCard({ id: item.id, title: item.title, poster_path: item.poster, type: item.type, release_date: "", vote_average: 0 }, true));
+                if (!item.poster) return;
+                continueRow.appendChild(buildCard({
+                    id: item.id,
+                    title: item.title,
+                    poster_path: item.poster,
+                    media_type: item.type,
+                    release_date: item.year || "",
+                    vote_average: item.rating || 0
+                }, true));
             });
+        }
+
+        async function loadContinue() {
+            let list = JSON.parse(localStorage.getItem("continueWatching") || "[]");
+            list = list.filter(x => x && x.id && x.poster);
+
+            // Paint immediately with whatever we have stored
+            renderContinueCards(list);
+
+            // Silently backfill metadata for older/legacy entries
+            const stale = list.filter(i => !i.year || !i.rating);
+            if (!stale.length) return;
+
+            let changed = false;
+            await Promise.all(stale.map(async (item) => {
+                try {
+                    const t = item.type === "tv" ? "tv" : "movie";
+                    const res = await fetch(`https://api.themoviedb.org/3/${t}/${item.id}?api_key=${TMDB_API_KEY}`);
+                    if (!res.ok) return;
+                    const d = await res.json();
+                    if (!d || (!d.title && !d.name)) return;
+                    item.title = d.title || d.name || item.title;
+                    item.poster = d.poster_path || item.poster;
+                    item.type = d.name && !d.title ? "tv" : "movie";
+                    item.year = (d.release_date || d.first_air_date || "").slice(0, 4);
+                    item.rating = d.vote_average || 0;
+                    changed = true;
+                } catch (e) { /* ignore */ }
+            }));
+
+            if (changed) {
+                localStorage.setItem("continueWatching", JSON.stringify(list));
+                renderContinueCards(list);
+            }
         }
 
         function buildCard(item, isContinue = false) {
             const title = item.title || item.name || "Untitled";
             const year = (item.release_date || item.first_air_date || "").slice(0, 4);
-            const type = item.title ? "movie" : "tv";
+            const type = (item.media_type === "movie" || item.media_type === "tv")
+                ? item.media_type
+                : (item.title ? "movie" : "tv");
             const rating = item.vote_average ? item.vote_average.toFixed(1) : '—';
             const card = document.createElement("div");
             card.className = "card";
@@ -1302,7 +1519,7 @@
               <div class="card-overlay">
                 <div class="play-icon">▶</div>
                 <h4>${title}</h4>
-                <div class="card-meta">${rating !== '—' ? `<span class="rating">★ ${rating}</span>` : ''}<span>${year || 'Soon'}</span></div>
+                <div class="card-meta">${rating !== '—' ? `<span class="rating">★ ${rating}</span>` : ''}${year ? `<span>${year}</span>` : ''}</div>
               </div>
               ${isContinue ? `<div class="continue-badge">Continue</div>` : ''}
               <div class="card-badge">${badgeText}</div>
@@ -1841,16 +2058,124 @@
             }
         }
 
+        /* ── RECENT SEARCHES (localStorage) ── */
+        const HISTORY_KEY = 'recentSearches';
+        const MAX_HISTORY = 5;
+        const searchHistoryPanel = document.getElementById('searchHistoryPanel');
+        const searchHistoryList = document.getElementById('searchHistoryList');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+        function getSearchHistory() {
+            try {
+                const raw = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                return Array.isArray(raw) ? raw.filter(x => typeof x === 'string' && x.trim()) : [];
+            } catch (e) { return []; }
+        }
+
+        function saveSearchHistory(list) {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, MAX_HISTORY)));
+        }
+
+        function addSearchHistory(query) {
+            const q = (query || '').trim();
+            if (!q) return;
+            let list = getSearchHistory().filter(x => x.toLowerCase() !== q.toLowerCase());
+            list.unshift(q);
+            list = list.slice(0, MAX_HISTORY);
+            saveSearchHistory(list);
+            renderSearchHistory();
+        }
+
+        function removeSearchHistory(query) {
+            const list = getSearchHistory().filter(x => x !== query);
+            saveSearchHistory(list);
+            renderSearchHistory();
+        }
+
+        function clearSearchHistory() {
+            saveSearchHistory([]);
+            renderSearchHistory();
+            showToast('Search history cleared');
+        }
+
+        function renderSearchHistory() {
+            if (!searchHistoryList || !clearHistoryBtn) return;
+            const list = getSearchHistory();
+
+            if (!list.length) {
+                searchHistoryList.innerHTML = `<div class="history-empty">No recent searches</div>`;
+                clearHistoryBtn.style.display = 'none';
+                return;
+            }
+
+            clearHistoryBtn.style.display = 'inline-flex';
+            searchHistoryList.innerHTML = '';
+
+            list.forEach(query => {
+                const row = document.createElement('div');
+                row.className = 'history-item';
+
+                const icon = document.createElement('span');
+                icon.className = 'hist-icon';
+                icon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+
+                const text = document.createElement('span');
+                text.className = 'hist-text';
+                text.textContent = query;
+                text.title = query;
+
+                const remove = document.createElement('button');
+                remove.className = 'hist-remove';
+                remove.title = 'Remove from history';
+                remove.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                remove.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeSearchHistory(query);
+                });
+
+                row.addEventListener('click', () => {
+                    searchInput.value = query;
+                    hideSearchHistory();
+                    searchMovie();
+                });
+
+                row.appendChild(icon);
+                row.appendChild(text);
+                row.appendChild(remove);
+                searchHistoryList.appendChild(row);
+            });
+        }
+
+        function showSearchHistory() {
+            if (!searchHistoryPanel) return;
+            renderSearchHistory();
+            searchHistoryPanel.classList.add('visible');
+        }
+
+        function hideSearchHistory() {
+            if (!searchHistoryPanel) return;
+            searchHistoryPanel.classList.remove('visible');
+        }
+
         async function searchMovie() {
             const query = searchInput.value.trim();
             if (!query) { closeSearch(); return; }
+
+            hideSearchHistory();
+            addSearchHistory(query);
+
             try {
                 const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
                 const data = await res.json();
-                const results = data.results.filter(r => r.poster_path).slice(0, 30);
+                const results = (data.results || []).filter(r => r.poster_path && r.media_type !== 'person').slice(0, 30);
                 searchGrid.innerHTML = "";
-                if (!results.length) { searchGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">No results found.</div>`; resultCount.textContent = '0 results'; }
-                else { resultCount.textContent = `${results.length} results`; results.forEach(item => searchGrid.appendChild(buildCard(item))); }
+                if (!results.length) {
+                    searchGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">No results found for “${query}”.</div>`;
+                    resultCount.textContent = '0 results';
+                } else {
+                    resultCount.textContent = `${results.length} results`;
+                    results.forEach(item => searchGrid.appendChild(buildCard(item)));
+                }
                 searchResults.classList.add("visible");
                 searchResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
             } catch (err) { console.error(err); }
@@ -1859,12 +2184,19 @@
         function closeSearch() {
             searchResults.classList.remove("visible");
             searchInput.value = '';
+            hideSearchHistory();
         }
 
         function toggleSearch() {
-            navSearch.classList.toggle('expanded');
-            if (navSearch.classList.contains('expanded')) setTimeout(() => searchInput.focus(), 100);
-            else { searchInput.value = ''; closeSearch(); }
+            const expanded = navSearch.classList.toggle('expanded');
+            if (expanded) {
+                setTimeout(() => searchInput.focus(), 100);
+                if (!searchInput.value.trim()) showSearchHistory();
+            } else {
+                searchInput.value = '';
+                hideSearchHistory();
+                closeSearch();
+            }
         }
 
         function showCategoryPage(type) {
@@ -1958,8 +2290,35 @@
             await Promise.all(genrePromises);
             loadContinue();
             renderMyLists();
-            searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') searchMovie(); });
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeSearch(); navSearch.classList.remove('expanded'); } });
+            renderSearchHistory();
+
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') searchMovie();
+            });
+
+            searchInput.addEventListener('input', () => {
+                if (searchInput.value.trim()) hideSearchHistory();
+                else if (navSearch.classList.contains('expanded')) showSearchHistory();
+            });
+
+            searchInput.addEventListener('focus', () => {
+                if (!searchInput.value.trim() && getSearchHistory().length) showSearchHistory();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    hideSearchHistory();
+                    navSearch.classList.remove('expanded');
+                    closeSearch();
+                }
+            });
+
+            // Close the recent-searches panel when clicking outside of it
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('#navSearch') || e.target.closest('#searchHistoryPanel')) return;
+                hideSearchHistory();
+            });
+
             showCategoryPage('home');
         }
 
