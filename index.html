@@ -91,6 +91,12 @@
         .brand-divider { color: rgba(255, 255, 255, 0.3); font-size: 16px; margin: 0 2px; }
         .brand-tag { font-size: 10px; font-weight: 400; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255, 255, 255, 0.35); }
 
+        /* ── NAV CENTER + MERGED GLASS ── */
+        .nav-center {
+            position: relative;
+            justify-self: center;
+        }
+
         .nav-pill {
             display: flex;
             align-items: center;
@@ -102,8 +108,19 @@
             border-radius: 100px;
             padding: 14px 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            justify-self: center;
-            transition: all 0.4s ease;
+            transition: border-radius 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* When the history panel is open, flatten the pill bottom so it merges */
+        .nav-pill.history-open {
+            border-radius: 28px 28px 0 0;
+            border-bottom-color: transparent;
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15),
+                        0 0 0 rgba(0, 0, 0, 0);
         }
 
         .nav-link {
@@ -176,7 +193,6 @@
             box-shadow: 0 0 16px rgba(110, 231, 183, 0.05);
         }
 
-        /* ── NEW ARROW BUTTON INSIDE SEARCH ── */
         .nav-search-arrow {
             width: 38px;
             height: 38px;
@@ -185,7 +201,7 @@
             background: transparent;
             color: rgba(255, 255, 255, 0.6);
             cursor: pointer;
-            display: none; /* hidden by default */
+            display: none;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
@@ -194,57 +210,56 @@
         }
 
         .nav-search.expanded .nav-search-arrow {
-            display: flex; /* shows when search is open */
+            display: flex;
         }
 
         .nav-search-arrow:hover {
             background: rgba(110, 231, 183, 0.15);
             color: #6ee7b7;
         }
-        /* ── END ARROW BUTTON ── */
 
         .nav-right { justify-self: end; }
 
-        .nav-center { position: relative; }
-
-        /* ── RECENT SEARCHES PANEL ── */
+        /* ── RECENT SEARCHES — MERGED GLASS PANEL ── */
         .search-history-panel {
             position: absolute;
-            top: calc(100% + 14px);
-            left: 50%;
-            width: 360px;
-            max-width: calc(100vw - 32px);
-            background: rgba(13, 13, 22, 0.92);
-            backdrop-filter: blur(28px) saturate(180%);
-            -webkit-backdrop-filter: blur(28px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 20px;
-            padding: 16px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(110, 231, 183, 0.04);
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: none;
+            border-radius: 0 0 28px 28px;
+            padding: 4px 14px 14px;
+            box-shadow: 0 26px 48px rgba(0, 0, 0, 0.45),
+                        0 0 30px rgba(110, 231, 183, 0.04);
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transform: translateX(-50%) translateY(-10px) scale(0.98);
-            transition: opacity 0.28s ease,
-                        transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                        visibility 0.28s;
-            z-index: 1200;
+            transform: translateY(-16px) scale(0.985);
+            transform-origin: top center;
+            transition: opacity 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.44s cubic-bezier(0.16, 1, 0.3, 1),
+                        visibility 0.34s;
+            z-index: 1;
         }
 
         .search-history-panel.visible {
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
-            transform: translateX(-50%) translateY(0) scale(1);
+            transform: translateY(0) scale(1);
         }
 
         .search-history-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 6px 12px;
-            margin-bottom: 6px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px 8px 10px;
+            margin-bottom: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .search-history-title {
@@ -756,7 +771,30 @@
             border: 1px solid rgba(110, 231, 183, 0.08);
         }
 
-        .continue-badge { position: absolute; top: 10px; left: 10px; background: rgba(0, 0, 0, 0.7); padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .continue-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #6ee7b7;
+            border: 1px solid rgba(110, 231, 183, 0.2);
+            letter-spacing: 0.4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .continue-badge .cb-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #6ee7b7;
+            animation: heroPulse 1.8s ease-in-out infinite;
+        }
 
         .empty-state { text-align: center; padding: 40px 20px; color: rgba(255, 255, 255, 0.2); font-size: 16px; }
 
@@ -810,10 +848,31 @@
         .detail-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; color: rgba(255, 255, 255, 0.7); font-size: 16px; }
         .detail-meta .rating-star { color: #fbbf24; font-weight: 700; }
         .detail-desc { font-size: 18px; line-height: 1.7; color: rgba(255, 255, 255, 0.65); max-width: 700px; margin-bottom: 28px; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8); }
-        .detail-actions { display: flex; gap: 16px; align-items: center; }
+        .detail-actions { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
 
         .btn-play { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; padding: 18px 36px; font-size: 18px; font-weight: 600; border: none; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; box-shadow: 0 8px 30px rgba(124, 58, 237, 0.3); }
         .btn-play:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 40px rgba(124, 58, 237, 0.5); }
+
+        /* ── RESUME BUTTON (mint glass with play progress ring) ── */
+        .btn-resume-detail {
+            background: linear-gradient(135deg, #6ee7b7, #34d399);
+            color: #052e22;
+            padding: 18px 34px;
+            font-size: 18px;
+            font-weight: 800;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+            box-shadow: 0 8px 30px rgba(110, 231, 183, 0.32);
+            letter-spacing: 0.2px;
+        }
+        .btn-resume-detail:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 40px rgba(110, 231, 183, 0.5); }
+        .btn-resume-detail svg { flex-shrink: 0; }
+
         .btn-add { width: 56px; height: 56px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; font-size: 26px; cursor: pointer; transition: 0.3s; }
         .btn-add:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
         .btn-outline-light { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 16px 28px; font-size: 16px; font-weight: 500; border-radius: 50px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
@@ -833,8 +892,26 @@
         .episode-search { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 14px 20px; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 15px; width: 300px; outline: none; }
         .episode-search::placeholder { color: rgba(255, 255, 255, 0.4); }
         .episode-list { display: flex; flex-direction: column; gap: 16px; }
-        .episode-item { display: flex; background: rgba(255, 255, 255, 0.04); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); overflow: hidden; cursor: pointer; transition: 0.3s; }
+        .episode-item { display: flex; background: rgba(255, 255, 255, 0.04); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.05); overflow: hidden; cursor: pointer; transition: 0.3s; position: relative; }
         .episode-item:hover { background: rgba(255, 255, 255, 0.08); transform: translateX(4px); }
+        .episode-item.current-episode {
+            border-color: rgba(110, 231, 183, 0.4);
+            background: rgba(110, 231, 183, 0.06);
+        }
+        .episode-item.current-episode::before {
+            content: 'NOW WATCHING';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(110, 231, 183, 0.9);
+            color: #052e22;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            padding: 3px 8px;
+            border-radius: 100px;
+            z-index: 2;
+        }
         .episode-thumb { width: 160px; height: 90px; object-fit: cover; background-color: #0d0d16; }
         .episode-info { padding: 16px 20px; flex: 1; }
         .episode-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -981,12 +1058,15 @@
             .nav { padding: 12px 16px; }
             .nav-center { order: 3; width: 100%; justify-content: center; margin-top: 8px; }
             .nav-search.expanded input { width: 120px; }
+            .search-history-panel { max-width: 100%; }
             .detail-header { padding: 0 20px; }
             .detail-content { padding: 0 20px; }
             .detail-title { font-size: 38px; }
             .episode-search { width: 100%; }
             .episode-toolbar { flex-direction: column; align-items: flex-start; }
             #myListView { padding: 100px 20px 40px; }
+            .btn-resume-detail { padding: 14px 22px; font-size: 15px; }
+            .btn-play { padding: 14px 22px; font-size: 15px; }
         }
     </style>
 </head>
@@ -1005,7 +1085,7 @@
         </div>
 
         <div class="nav-center">
-            <div class="nav-pill">
+            <div class="nav-pill" id="navPill">
                 <div class="nav-search" id="navSearch">
                     <button class="nav-search-btn" onclick="toggleSearch()">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1027,6 +1107,7 @@
                 <a class="nav-link" href="#" onclick="showMyList()">My List</a>
             </div>
 
+            <!-- Merged glass panel — visually drops down from the nav pill -->
             <div class="search-history-panel" id="searchHistoryPanel">
                 <div class="search-history-header">
                     <span class="search-history-title">Recent Searches</span>
@@ -1274,6 +1355,13 @@
             </div>
             <div class="detail-desc" id="detailDesc">Loading description...</div>
             <div class="detail-actions">
+                <!-- RESUME button (only for TV with saved progress) -->
+                <button class="btn-resume-detail" id="resumeBtn" onclick="resumeFromProgress()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                        <polygon points="6 4 20 12 6 20"></polygon>
+                    </svg>
+                    <span id="resumeBtnLabel">Resume</span>
+                </button>
                 <button class="btn-play" onclick="playDetail()">Play</button>
                 <button class="btn-add" onclick="openAddToListModal()">+</button>
                 <button class="btn-outline-light" id="episodesButton" onclick="scrollToEpisodes()" style="display: none;">Episodes</button>
@@ -1338,6 +1426,7 @@
         const resultCount = document.getElementById("resultCount");
         const searchInput = document.getElementById("searchInput");
         const navSearch = document.getElementById("navSearch");
+        const navPill = document.getElementById("navPill");
 
         const categoryRow = document.getElementById("categoryRow");
         const categoryView = document.getElementById("categoryView");
@@ -1362,6 +1451,8 @@
         const recommendationsGrid = document.getElementById("recommendationsGrid");
         const trailerContainer = document.getElementById("trailerContainer");
         const muteTrailerBtn = document.getElementById("muteTrailerBtn");
+        const resumeBtn = document.getElementById("resumeBtn");
+        const resumeBtnLabel = document.getElementById("resumeBtnLabel");
 
         let currentCategory = 'home';
         let currentSort = 'popular';
@@ -1433,9 +1524,14 @@
         function nextHeroSlide() { if (heroItems.length) goToHeroSlide((currentHeroIndex + 1) % heroItems.length); }
         function prevHeroSlide() { if (heroItems.length) goToHeroSlide((currentHeroIndex - 1 + heroItems.length) % heroItems.length); }
 
-        function saveContinue(item, type) {
+        /* ─────────────────────────────────────────────
+           CONTINUE WATCHING — now stores season/episode
+           ───────────────────────────────────────────── */
+        function saveContinue(item, type, season = null, episode = null) {
             let list = JSON.parse(localStorage.getItem("continueWatching") || "[]");
             const mediaType = type || (item.title ? "movie" : "tv");
+            const existing = list.find(x => x.id === item.id);
+
             list = list.filter(x => x.id !== item.id);
             list.unshift({
                 id: item.id,
@@ -1444,10 +1540,17 @@
                 backdrop: item.backdrop_path || null,
                 type: mediaType,
                 year: (item.release_date || item.first_air_date || "").slice(0, 4),
-                rating: item.vote_average || 0
+                rating: item.vote_average || 0,
+                season: mediaType === 'tv' ? (season != null ? season : (existing?.season || 1)) : null,
+                episode: mediaType === 'tv' ? (episode != null ? episode : (existing?.episode || 1)) : null
             });
             localStorage.setItem("continueWatching", JSON.stringify(list.slice(0, 10)));
             loadContinue();
+        }
+
+        function getContinueEntry(id) {
+            const list = JSON.parse(localStorage.getItem("continueWatching") || "[]");
+            return list.find(x => String(x.id) === String(id)) || null;
         }
 
         function renderContinueCards(list) {
@@ -1464,7 +1567,9 @@
                     poster_path: item.poster,
                     media_type: item.type,
                     release_date: item.year || "",
-                    vote_average: item.rating || 0
+                    vote_average: item.rating || 0,
+                    season: item.season,
+                    episode: item.episode
                 }, true));
             });
         }
@@ -1509,10 +1614,20 @@
             const type = (item.media_type === "movie" || item.media_type === "tv")
                 ? item.media_type
                 : (item.title ? "movie" : "tv");
-            const rating = item.vote_average ? item.vote_average.toFixed(1) : '—';
+            const rating = item.vote_average ? Number(item.vote_average).toFixed(1) : '—';
             const card = document.createElement("div");
             card.className = "card";
             const badgeText = isContinue ? "⏵" : (type === "movie" ? "M" : "TV");
+
+            let continueBadgeHTML = '';
+            if (isContinue) {
+                if (type === 'tv' && item.season && item.episode) {
+                    continueBadgeHTML = `<div class="continue-badge"><span class="cb-dot"></span>S${item.season} E${item.episode}</div>`;
+                } else {
+                    continueBadgeHTML = `<div class="continue-badge"><span class="cb-dot"></span>Continue</div>`;
+                }
+            }
+
             card.innerHTML = `
             <div class="card-img-wrap">
               <img src="${IMG_BASE}${POSTER_SIZE}${item.poster_path}" alt="${title}" loading="lazy" />
@@ -1521,7 +1636,7 @@
                 <h4>${title}</h4>
                 <div class="card-meta">${rating !== '—' ? `<span class="rating">★ ${rating}</span>` : ''}${year ? `<span>${year}</span>` : ''}</div>
               </div>
-              ${isContinue ? `<div class="continue-badge">Continue</div>` : ''}
+              ${continueBadgeHTML}
               <div class="card-badge">${badgeText}</div>
             </div>`;
             card.onclick = () => openDetailView(type, item.id);
@@ -1643,6 +1758,9 @@
                     episodesSection.style.display = 'none';
                 }
 
+                // ── RESUME BUTTON ──
+                updateResumeButton(type, id);
+
                 loadCast(type, id);
                 loadRecommendations(type, id);
                 fetchVideos(type, id);
@@ -1650,6 +1768,40 @@
             } catch (err) {
                 detailTitle.textContent = "Error loading";
             }
+        }
+
+        /* ─────────────────────────────────────────────
+           RESUME BUTTON LOGIC
+           ───────────────────────────────────────────── */
+        function updateResumeButton(type, id) {
+            if (!resumeBtn || !resumeBtnLabel) return;
+
+            if (type !== 'tv') {
+                resumeBtn.style.display = 'none';
+                return;
+            }
+
+            const entry = getContinueEntry(id);
+            if (entry && entry.season && entry.episode) {
+                resumeBtn.style.display = 'flex';
+                resumeBtnLabel.textContent = `Resume S${entry.season} E${entry.episode}`;
+            } else {
+                resumeBtn.style.display = 'none';
+            }
+        }
+
+        function resumeFromProgress() {
+            const entry = getContinueEntry(currentDetailId);
+            if (!entry || !entry.season || !entry.episode) {
+                showToast('Nothing to resume yet — press Play to start.', 'error');
+                return;
+            }
+            // Sync the season selector UI to the resumed season
+            if (typeof loadEpisodes === 'function') {
+                selectSeason(entry.season);
+            }
+            saveContinue(currentDetailData, 'tv', entry.season, entry.episode);
+            openStellarPlayer('tv', currentDetailId, entry.season, entry.episode);
         }
 
         function closeModal() {
@@ -1923,7 +2075,10 @@
                     option.onclick = () => selectSeason(season.season_number);
                     seasonOptions.appendChild(option);
                 });
-                if (data.seasons.length) selectSeason(data.seasons[0].season_number);
+                // Default to the resumed season if there's progress, else first
+                const entry = getContinueEntry(currentDetailId);
+                const startSeason = (entry && entry.season) ? entry.season : (data.seasons[0] && data.seasons[0].season_number);
+                if (startSeason != null) selectSeason(startSeason);
             }
         }
 
@@ -1942,10 +2097,16 @@
             const res = await fetch(`https://api.themoviedb.org/3/tv/${currentDetailId}/season/${seasonNum}?api_key=${TMDB_API_KEY}`);
             const data = await res.json();
             episodeList.innerHTML = '';
+            const entry = getContinueEntry(currentDetailId);
+            const currentEp = (entry && Number(entry.season) === Number(seasonNum)) ? Number(entry.episode) : null;
+
             if (data.episodes) {
                 data.episodes.forEach(episode => {
                     const item = document.createElement('div');
                     item.className = 'episode-item';
+                    if (currentEp != null && Number(episode.episode_number) === currentEp) {
+                        item.classList.add('current-episode');
+                    }
                     const epNum = episode.episode_number;
                     const epTitle = episode.name || `Episode ${epNum}`;
                     const epDesc = episode.overview || 'No description.';
@@ -2018,14 +2179,15 @@
             let season = 1, episode = 1;
             if (currentDetailType === 'tv') {
                 const selText = document.getElementById('selectedSeasonText');
-                if (selText) { const match = selText.textContent.match(/\d+/); if (match) season = match[0]; }
+                if (selText) { const match = selText.textContent.match(/\d+/); if (match) season = Number(match[0]); }
+                episode = 1;
             }
-            saveContinue(currentDetailData, currentDetailType);
+            saveContinue(currentDetailData, currentDetailType, season, episode);
             openStellarPlayer(currentDetailType, currentDetailId, season, episode);
         }
 
         function playSpecificEpisode(season, episode) {
-            saveContinue(currentDetailData, 'tv');
+            saveContinue(currentDetailData, 'tv', season, episode);
             openStellarPlayer('tv', currentDetailId, season, episode);
         }
 
@@ -2058,7 +2220,9 @@
             }
         }
 
-        /* ── RECENT SEARCHES (localStorage) ── */
+        /* ─────────────────────────────────────────────
+           RECENT SEARCHES (localStorage, max 5)
+           ───────────────────────────────────────────── */
         const HISTORY_KEY = 'recentSearches';
         const MAX_HISTORY = 5;
         const searchHistoryPanel = document.getElementById('searchHistoryPanel');
@@ -2150,11 +2314,13 @@
             if (!searchHistoryPanel) return;
             renderSearchHistory();
             searchHistoryPanel.classList.add('visible');
+            navPill.classList.add('history-open');
         }
 
         function hideSearchHistory() {
             if (!searchHistoryPanel) return;
             searchHistoryPanel.classList.remove('visible');
+            navPill.classList.remove('history-open');
         }
 
         async function searchMovie() {
@@ -2315,7 +2481,7 @@
 
             // Close the recent-searches panel when clicking outside of it
             document.addEventListener('click', (e) => {
-                if (e.target.closest('#navSearch') || e.target.closest('#searchHistoryPanel')) return;
+                if (e.target.closest('#navSearch') || e.target.closest('#searchHistoryPanel') || e.target.closest('#navPill')) return;
                 hideSearchHistory();
             });
 
