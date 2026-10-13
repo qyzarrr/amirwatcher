@@ -744,7 +744,7 @@ const modalContent=document.getElementById('modalContent');
 let currentModalSelectedIndex=-1;
 
 const GAMES_DATA=[
-{name:"GTA 5",url:"https://gta.deloskiyt.pl/",category:"Open World",accent:"#f59e0b",image:"images/GTA5.webp",icon:"<svg width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 17h18'/><path d='M5 17v-6l3-4h8l3 4v6'/><circle cx='8' cy='14' r='1.5'/><circle cx='16' cy='14' r='1.5'/></svg>"},
+{name:"GTA 5",url:"https://gta.deloskiyt.pl/",category:"Open World",accent:"#f59e0b",image:"images/GTA5.webp",newTab:true,icon:"<svg width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 17h18'/><path d='M5 17v-6l3-4h8l3 4v6'/><circle cx='8' cy='14' r='1.5'/><circle cx='16' cy='14' r='1.5'/></svg>"},
 {name:"Mario Kart 8",url:"https://mariokart8.online/",category:"Racing",accent:"#ef4444",image:"images/MarioKart8.webp",icon:"<svg width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 2v4'/><path d='M12 6l4 4'/><circle cx='12' cy='14' r='7'/><circle cx='12' cy='14' r='3'/></svg>"},
 {name:"Skate 3",url:"https://skate.aaddpp.lol/",category:"Sports",accent:"#3b82f6",image:"images/skate3.webp",icon:"<svg width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 20h16'/><path d='M6 20l4-10h4l4 10'/><circle cx='9' cy='7' r='1.5'/><circle cx='15' cy='7' r='1.5'/></svg>"},
 {name:"ClusterTruck",url:"https://wasm.rip/files/ClusterTruck/clustertruck.html",category:"Arcade",accent:"#8b5cf6",image:"images/clustertruck.webp",icon:"<svg width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='8' width='14' height='9' rx='1'/><path d='M16 11h4l2 3v3h-6'/><circle cx='6' cy='19' r='1.8'/><circle cx='18' cy='19' r='1.8'/></svg>"},
@@ -1124,7 +1124,7 @@ ripple.style.left=(e.clientX-rect.left)+'px';
 ripple.style.top=(e.clientY-rect.top)+'px';
 card.appendChild(ripple);
 setTimeout(()=>ripple.remove(),700);
-openGameModal(game);
+if(game.newTab){window.open(game.url,'_blank','noopener,noreferrer');}else{openGameModal(game);}
 });
 return card;
 }
