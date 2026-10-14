@@ -1431,7 +1431,6 @@ const data=await res.json();
 const recs=data.results?data.results.slice(0,10):[];
 recs.forEach(rec=>recommendationsGrid.appendChild(buildCard(rec)));
 }
-
 /* ---- Stellar embed URL builder ---- */
 function buildStellarUrl(type, id, season, episode) {
   const base = 'https://stellar.rip/en/watch/embed';
@@ -1451,41 +1450,7 @@ function openStellarPlayer(type, id, season = 1, episode = 1) {
   stopTrailer();
   const url = buildStellarUrl(type, id, season, episode);
   if (!url) return;
-
-  // Remove any existing player first (prevents stacking)
-  const existing = document.getElementById('playerView');
-  if (existing) existing.remove();
-
-  const poster = currentDetailData && currentDetailData.poster_path
-    ? `${IMG_BASE}${POSTER_SIZE}${currentDetailData.poster_path}`
-    : '';
-  const title = currentDetailData
-    ? (currentDetailData.title || currentDetailData.name || '')
-    : '';
-  const overview = currentDetailData ? (currentDetailData.overview || '') : '';
-
-  document.body.insertAdjacentHTML('beforeend', `
-    <div id="playerView" class="player-view">
-      <div class="player-background">
-        <iframe id="playerIframe"
-          src="${url}"
-          frameborder="0"
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          allowfullscreen></iframe>
-      </div>
-      <div class="player-overlay" id="playerOverlay" style="display:none;">
-        <div class="player-info">
-          ${poster ? `<img class="player-poster" src="${poster}" alt="Poster">` : ''}
-          <h1 class="player-title">${title}</h1>
-          <p class="player-desc">${overview}</p>
-          <div class="player-buttons">
-            <button class="btn-resume" onclick="startPlayback('${type}', ${id}, false, ${season}, ${episode})">Resume</button>
-            <button class="btn-restart" onclick="startPlayback('${type}', ${id}, true, ${season}, ${episode})">Start Over</button>
-          </div>
-        </div>
-      </div>
-      <div class="player-close" onclick="closePlayer()">✕</div>
-    </div>`);
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 function playDetail() {
@@ -1517,17 +1482,8 @@ function playSpecificEpisode(season, episode) {
 function startPlayback(type, id, startOver, season, episode) {
   const url = buildStellarUrl(type, id, season, episode);
   if (!url) return;
-
-  // If "start over" is chosen we explicitly strip any startAt progress
-  const finalUrl = startOver
-    ? url.replace(/startAt=\d+/, 'startAt=0')
-    : url;
-
-  const iframe = document.getElementById('playerIframe');
-  if (iframe) iframe.src = finalUrl;
-
-  const overlay = document.getElementById('playerOverlay');
-  if (overlay) overlay.style.display = 'none';
+  const finalUrl = startOver ? url.replace(/startAt=\d+/, 'startAt=0') : url;
+  window.open(finalUrl, '_blank', 'noopener,noreferrer');
 }
 
 function closePlayer(){
