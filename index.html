@@ -1431,59 +1431,58 @@ const data=await res.json();
 const recs=data.results?data.results.slice(0,10):[];
 recs.forEach(rec=>recommendationsGrid.appendChild(buildCard(rec)));
 }
-/* ---- Stellar embed URL builder ---- */
-function buildStellarUrl(type, id, season, episode) {
-  const base = 'https://stellar.rip/en/watch/embed';
-  const params = 'theme=9B8CFF&title=true&poster=true&autoPlay=false&startAt=0';
-  if (type === 'movie') {
-    return `${base}/movie/${id}?${params}`;
-  }
-  if (type === 'tv') {
-    const s = season != null ? season : 1;
-    const e = episode != null ? episode : 1;
-    return `${base}/tv/${id}-${s}-${e}?${params}&nextButton=true&autoNext=false`;
-  }
-  return null;
+
+function openStellarPlayer(type,id,season=1,episode=1){
+stopTrailer();
+let baseUrl;
+if(type==='movie')baseUrl=`https://stellar.rip/en/watch/embed/movie/${id}?theme=9B8CFF&title=true&poster=true&autoPlay=true&startAt=0`;
+else if(type==='tv')baseUrl=`https://stellar.rip/en/watch/embed/tv/${id}-${season}-${episode}?theme=9B8CFF&title=true&poster=true&autoPlay=true&startAt=0&nextButton=true&autoNext=false`;
+else return;
+document.body.insertAdjacentHTML('beforeend',`
+<div id="playerView" class="player-view">
+<div class="player-background">
+<iframe id="playerIframe" src="${baseUrl}" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+</div>
+<div class="player-overlay" id="playerOverlay" style="display:none;">
+<div class="player-info">
+<img class="player-poster" src="${IMG_BASE}${POSTER_SIZE}${currentDetailData.poster_path}" alt="Poster">
+<h1 class="player-title">${currentDetailData.title||currentDetailData.name}</h1>
+<p class="player-desc">${currentDetailData.overview||''}</p>
+<div class="player-buttons">
+<button class="btn-resume" onclick="startPlayback('${type}', ${id}, false, ${season}, ${episode})">Resume</button>
+<button class="btn-restart" onclick="startPlayback('${type}', ${id}, true, ${season}, ${episode})">Start Over</button>
+</div>
+</div>
+</div>
+<div class="player-close" onclick="closePlayer()">✕</div>
+</div>`);
 }
 
-function openStellarPlayer(type, id, season = 1, episode = 1) {
-  stopTrailer();
-  const url = buildStellarUrl(type, id, season, episode);
-  if (!url) return;
-  window.open(url, '_blank', 'noopener,noreferrer');
+function playDetail(){
+let season=1,episode=1;
+if(currentDetailType==='tv'){
+const selText=document.getElementById('selectedSeasonText');
+if(selText){const match=selText.textContent.match(/\d+/);if(match)season=Number(match[0]);}
+episode=1;
+}
+saveContinue(currentDetailData,currentDetailType,season,episode);
+openStellarPlayer(currentDetailType,currentDetailId,season,episode);
 }
 
-function playDetail() {
-  let season = 1;
-  let episode = 1;
-
-  if (currentDetailType === 'tv') {
-    const selText = document.getElementById('selectedSeasonText');
-    if (selText) {
-      const match = selText.textContent.match(/\d+/);
-      if (match) season = Number(match[0]);
-    }
-    // Resume at the last-watched episode if there is one for this season
-    const entry = getContinueEntry(currentDetailId);
-    if (entry && Number(entry.season) === Number(season) && entry.episode) {
-      episode = Number(entry.episode);
-    }
-  }
-
-  saveContinue(currentDetailData, currentDetailType, season, episode);
-  openStellarPlayer(currentDetailType, currentDetailId, season, episode);
+function playSpecificEpisode(season,episode){
+saveContinue(currentDetailData,'tv',season,episode);
+openStellarPlayer('tv',currentDetailId,season,episode);
 }
 
-function playSpecificEpisode(season, episode) {
-  saveContinue(currentDetailData, 'tv', season, episode);
-  openStellarPlayer('tv', currentDetailId, season, episode);
-}
-
-function startPlayback(type, id, startOver, season, episode) {
-  const url = buildStellarUrl(type, id, season, episode);
-  if (!url) return;
-  const finalUrl = startOver ? url.replace(/startAt=\d+/, 'startAt=0') : url;
-  window.open(finalUrl, '_blank', 'noopener,noreferrer');
+function startPlayback(type,id,startOver,season,episode){
+let playUrl;
+const startAt=startOver?'0':'0';
+if(type==='movie')playUrl=`https://stellar.rip/en/watch/embed/movie/${id}?theme=9B8CFF&title=true&poster=true&autoPlay=true&startAt=${startAt}`;
+else if(type==='tv')playUrl=`https://stellar.rip/en/watch/embed/tv/${id}-${season}-${episode}?theme=9B8CFF&title=true&poster=true&autoPlay=true&startAt=${startAt}&nextButton=true&autoNext=false`;
+const iframe=document.getElementById('playerIframe');
+if(iframe)iframe.src=playUrl;
+const overlay=document.getElementById('playerOverlay');
+if(overlay)overlay.style.display='none';
 }
 
 function closePlayer(){
