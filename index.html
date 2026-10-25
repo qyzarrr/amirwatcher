@@ -339,6 +339,13 @@ body{font-family:'Inter',sans-serif;background:#07070b;color:#f0f0f5;overflow-x:
 .game-modal-backdrop{padding:12px}
 .game-modal{height:95vh}
 }
+.player-source-toolbar{position:absolute;top:20px;right:20px;z-index:30;display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:min(390px,calc(100% - 100px));padding:10px 12px;border:1px solid #ffffff30;border-radius:10px;background:#101018ed;font-size:12px}
+.player-source-toolbar label{color:#c6c6d4}
+.player-source-toolbar select{max-width:180px;background:#20202c;color:#fff;border:1px solid #ffffff40;border-radius:6px;padding:7px;font:inherit}
+.player-source-toolbar select:focus-visible{outline:2px solid #6ee7b7}
+.player-source-toolbar small{flex-basis:100%;color:#bcbccc;font-size:10px;line-height:1.4}
+@media(max-width:480px){.player-source-toolbar{top:12px;right:12px;gap:5px}.player-source-toolbar small{max-width:240px}}
+
 </style>
 </head>
 <body>
@@ -1432,22 +1439,43 @@ const recs=data.results?data.results.slice(0,10):[];
 recs.forEach(rec=>recommendationsGrid.appendChild(buildCard(rec)));
 }
 
-// Static embed provider. Keep the sandbox on playerIframe: it blocks popup
-// tabs, downloads and attempts to navigate the parent website.
-function buildMovieEmbedURL(type,id,season=1,episode=1){
+// Compatible, popup-restricted sources documented by EmbedWave.
+const PLAYER_SOURCES=[{id:"cinesrc",name:"Cinesrc"},{id:"nxsha",name:"Multi HD"}];
+// Multi HD was reported to return a different show for South Park.
+const PLAYER_SOURCE_DEFAULTS={"tv:2190":"cinesrc"};
+let activePlayerSelection=null;
+function getMoviePlayerSource(type,id){
+  try{
+    const saved=localStorage.getItem("amir:player-source:"+type+":"+id);
+    if(PLAYER_SOURCES.some(source=>source.id===saved))return saved;
+  }catch(_){}
+  return PLAYER_SOURCE_DEFAULTS[type+":"+id]||"nxsha";
+}
+function buildMovieEmbedURL(type,id,season=1,episode=1,source=getMoviePlayerSource(type,id)){
   if(!Number.isInteger(Number(id))||Number(id)<=0)throw new Error("Invalid movie or show ID");
+  if(!PLAYER_SOURCES.some(item=>item.id===source))throw new Error("Unsupported video source");
   let path;
   if(type==="movie")path="/embed/movie/"+Number(id);
   else if(type==="tv"){
     if(!Number.isInteger(Number(season))||Number(season)<0||!Number.isInteger(Number(episode))||Number(episode)<1)throw new Error("Invalid episode");
     path="/embed/tv/"+Number(id)+"/"+Number(season)+"/"+Number(episode);
   }else throw new Error("Unsupported media type");
-  return "https://embedwave.cc"+path+"?server=nxsha&autoplay=1";
+  return "https://embedwave.cc"+path+"?server="+source+"&autoplay=1";
 }
+function changeMovieSource(source){
+  if(!activePlayerSelection||!PLAYER_SOURCES.some(item=>item.id===source))return;
+  const selected=activePlayerSelection;
+  try{localStorage.setItem("amir:player-source:"+selected.type+":"+selected.id,source);}catch(_){}
+  const frame=document.getElementById("playerIframe");
+  if(frame)frame.src=buildMovieEmbedURL(selected.type,selected.id,selected.season,selected.episode,source);
+}
+
 function openMoviePlayer(type,id,season=1,episode=1){
 stopTrailer();
 if(type!=='movie'&&type!=='tv')return;
-const baseUrl=buildMovieEmbedURL(type,id,season,episode);
+activePlayerSelection={type,id:Number(id),season:Number(season),episode:Number(episode)};
+const selectedSource=getMoviePlayerSource(type,id);
+const baseUrl=buildMovieEmbedURL(type,id,season,episode,selectedSource);
 document.body.insertAdjacentHTML('beforeend',`
 <div id="playerView" class="player-view">
 <div class="player-background">
@@ -1465,6 +1493,14 @@ document.body.insertAdjacentHTML('beforeend',`
 </div>
 </div>
 <div class="player-close" onclick="closePlayer()">✕</div>
+<div class="player-source-toolbar">
+<label for="playerSource">Video source</label>
+<select id="playerSource" onchange="changeMovieSource(this.value)">
+${PLAYER_SOURCES.map(source=>`<option value="${source.id}" ${selectedSource===source.id?"selected":""}>${source.name}</option>`).join("")}
+</select>
+<span id="playerSourceEpisode">${type==="tv"?"S"+season+" · E"+episode:"Movie"}</span>
+<small>Wrong video? Try the other source. Switching restarts playback.</small>
+</div>
 </div>`);
 }
 
@@ -1485,7 +1521,11 @@ openMoviePlayer('tv',currentDetailId,season,episode);
 }
 
 function startPlayback(type,id,startOver,season,episode){
-const playUrl=buildMovieEmbedURL(type,id,season,episode);
+activePlayerSelection={type,id:Number(id),season:Number(season),episode:Number(episode)};
+const selectedSource=getMoviePlayerSource(type,id);
+const playUrl=buildMovieEmbedURL(type,id,season,episode,selectedSource);
+const sourceSelect=document.getElementById("playerSource");if(sourceSelect)sourceSelect.value=selectedSource;
+const episodeLabel=document.getElementById("playerSourceEpisode");if(episodeLabel)episodeLabel.textContent=type==="tv"?"S"+season+" · E"+episode:"Movie";
 const iframe=document.getElementById('playerIframe');
 if(iframe)iframe.src=playUrl;
 const overlay=document.getElementById('playerOverlay');
@@ -1493,6 +1533,7 @@ if(overlay)overlay.style.display='none';
 }
 
 function closePlayer(){
+activePlayerSelection=null;
 const player=document.getElementById('playerView');
 if(player)player.remove();
 }
