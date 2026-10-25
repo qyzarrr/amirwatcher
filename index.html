@@ -972,7 +972,7 @@ const entry=getContinueEntry(currentDetailId);
 if(!entry||!entry.season||!entry.episode){showToast('Nothing to resume yet — press Play to start.','error');return;}
 if(typeof loadEpisodes==='function'){selectSeason(entry.season);}
 saveContinue(currentDetailData,'tv',entry.season,entry.episode);
-openStellarPlayer('tv',currentDetailId,entry.season,entry.episode);
+openMoviePlayer('tv',currentDetailId,entry.season,entry.episode);
 }
 
 function closeModal(){modalOverlay.classList.remove('visible');modalContent.innerHTML='';currentModal=null;currentModalSelectedIndex=-1;}
@@ -1432,16 +1432,26 @@ const recs=data.results?data.results.slice(0,10):[];
 recs.forEach(rec=>recommendationsGrid.appendChild(buildCard(rec)));
 }
 
-function openStellarPlayer(type,id,season=1,episode=1){
+// Static embed provider. Keep the sandbox on playerIframe: it blocks popup
+// tabs, downloads and attempts to navigate the parent website.
+function buildMovieEmbedURL(type,id,season=1,episode=1){
+  if(!Number.isInteger(Number(id))||Number(id)<=0)throw new Error("Invalid movie or show ID");
+  let path;
+  if(type==="movie")path="/embed/movie/"+Number(id);
+  else if(type==="tv"){
+    if(!Number.isInteger(Number(season))||Number(season)<0||!Number.isInteger(Number(episode))||Number(episode)<1)throw new Error("Invalid episode");
+    path="/embed/tv/"+Number(id)+"/"+Number(season)+"/"+Number(episode);
+  }else throw new Error("Unsupported media type");
+  return "https://embedwave.cc"+path+"?server=nxsha&autoplay=1";
+}
+function openMoviePlayer(type,id,season=1,episode=1){
 stopTrailer();
-let baseUrl;
-if(type==='movie')baseUrl=`https://stellar.rip/en/watch/embed/movie/${id}?theme=9B8CFF&title=true&poster=true&autoPlay=true&startAt=0`;
-else if(type==='tv')baseUrl=`https://stellar.rip/en/watch/embed/tv/${id}-${season}-${episode}?theme=9B8CFF&title=true&poster=true&autoPlay=true&startAt=0&nextButton=true&autoNext=false`;
-else return;
+if(type!=='movie'&&type!=='tv')return;
+const baseUrl=buildMovieEmbedURL(type,id,season,episode);
 document.body.insertAdjacentHTML('beforeend',`
 <div id="playerView" class="player-view">
 <div class="player-background">
-<iframe id="playerIframe" src="${baseUrl}" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+<iframe id="playerIframe" src="${baseUrl}" title="Movie player" frameborder="0" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" referrerpolicy="no-referrer" allowfullscreen></iframe>
 </div>
 <div class="player-overlay" id="playerOverlay" style="display:none;">
 <div class="player-info">
@@ -1466,19 +1476,16 @@ if(selText){const match=selText.textContent.match(/\d+/);if(match)season=Number(
 episode=1;
 }
 saveContinue(currentDetailData,currentDetailType,season,episode);
-openStellarPlayer(currentDetailType,currentDetailId,season,episode);
+openMoviePlayer(currentDetailType,currentDetailId,season,episode);
 }
 
 function playSpecificEpisode(season,episode){
 saveContinue(currentDetailData,'tv',season,episode);
-openStellarPlayer('tv',currentDetailId,season,episode);
+openMoviePlayer('tv',currentDetailId,season,episode);
 }
 
 function startPlayback(type,id,startOver,season,episode){
-let playUrl;
-const startAt=startOver?'0':'0';
-if(type==='movie')playUrl=`https://stellar.rip/en/watch/embed/movie/${id}?theme=9B8CFF&title=true&poster=true&autoPlay=true&startAt=${startAt}`;
-else if(type==='tv')playUrl=`https://stellar.rip/en/watch/embed/tv/${id}-${season}-${episode}?theme=9B8CFF&title=true&poster=true&autoPlay=true&startAt=${startAt}&nextButton=true&autoNext=false`;
+const playUrl=buildMovieEmbedURL(type,id,season,episode);
 const iframe=document.getElementById('playerIframe');
 if(iframe)iframe.src=playUrl;
 const overlay=document.getElementById('playerOverlay');
